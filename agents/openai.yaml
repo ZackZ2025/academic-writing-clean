@@ -1,0 +1,7 @@
+interface:
+  display_name: "Academic Writing Clean"
+  short_description: "Natural, journal-ready academic English"
+  default_prompt: "Use $skill to draft or revise a medical manuscript in clear, natural English and remove AI-like phrasing."
+
+policy:
+  allow_implicit_invocation: true
