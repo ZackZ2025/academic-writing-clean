@@ -1,85 +1,92 @@
 ---
 name: academic-writing-clean
-description: English-language academic writing and revision for medical manuscripts, especially original research and clinical research papers. Use when drafting or polishing titles, abstracts, IMRaD sections, response-to-reviewer revisions, or any manuscript text that feels generic, wordy, repetitive, overly abstract, or AI-like.
+description: "Use when coordinating English-language academic writing and revision for medical or biomedical manuscripts. Acts as the router for abstract, background, methods, results, and discussion skills while enforcing evidence boundaries, source-of-truth rules, and anti-AI style checks."
+version: 2.0.0
+author: Hermes Agent
+license: MIT
+metadata:
+  hermes:
+    tags: [academic-writing, manuscript, biomedical, imrad, editing]
+    related_skills: [manuscript-abstract-writing, manuscript-background-writing, manuscript-methods-writing, manuscript-results-writing, manuscript-discussion-writing, evidence-first-research, academic-deep-search, docx-editing, humanizer]
 ---
 
 # Academic Writing Clean
 
 ## Overview
 
-Use this skill to turn research into journal-ready English that sounds specific, controlled, and human. It is built for medical academic writing, especially original and clinical research papers, but the same workflow also helps when polishing titles, abstracts, cover letters, and section rewrites.
+Use this as the **medical/biomedical manuscript writing router**. It keeps the whole manuscript coherent, then dispatches section-specific work to narrower skills:
 
-## Workflow
+| Task | Load this skill |
+|---|---|
+| Abstract, highlights, structured abstract | `manuscript-abstract-writing` |
+| Introduction / Background / gap / rationale | `manuscript-background-writing` |
+| Methods, reproducibility, statistics, ethics, placeholders | `manuscript-methods-writing` |
+| Results, figure-flow, evidence-chain narration, minimal revision | `manuscript-results-writing` |
+| Discussion, limitations, implications, citation-backed interpretation | `manuscript-discussion-writing` |
+| Word `.docx` inspection/editing/verification | `docx-editing` |
+| Literature support and evidence quality | `evidence-first-research`, `academic-deep-search` |
+| Anti-AI prose cleanup | `humanizer` plus the checks below |
 
-1. Identify the manuscript type, audience, and target journal.
-2. Build a working outline from the research question, figures, tables, and main findings.
-3. Draft Methods and Results first if the paper is hard to start.
-4. Draft the Introduction after the paper's contribution is clear.
-5. Draft the Discussion from major finding -> context -> limitations -> implications.
-6. Draft the title and abstract last.
-7. Revise for structure, clarity, and anti-AI style.
+Do **not** keep expanding this file into a monster. If the work belongs to one IMRaD section, load the relevant section skill.
 
-## Core Principles
+## When to Use
 
-- Prefer concrete claims over generic claims.
-- Keep one sentence to one main point whenever possible.
-- Write for the reader who needs to understand the work, not for a template.
-- Keep Methods reproducible, Results factual, Introduction selective, Discussion interpretive but restrained.
-- When a sentence feels machine-like, replace abstraction with data, actor, action, or consequence.
+Use this skill when:
 
-## Section Playbook
+- The user asks for general manuscript writing, polishing, or revision without naming a section.
+- Multiple sections must stay synchronized.
+- A manuscript has split Markdown sources plus an integrated Word candidate.
+- You need to decide which section-specific skill should own the task.
+- The user asks for academic prose that is concrete, restrained, and not AI-like.
 
-### Title
+Do not use this as the only skill when:
 
-- Describe the study, do not state the conclusion.
-- Keep it short, specific, and searchable.
-- Avoid metaphors, puns, unexplained acronyms, and vague phrases such as "study of" or "observations on".
+- The task is clearly only Abstract / Background / Methods / Results / Discussion. Load the specific skill too.
+- The task is file-level `.docx` manipulation. Load `docx-editing`.
+- The task requires new literature support. Load `evidence-first-research` or `academic-deep-search` before drafting.
 
-### Abstract
+## Global Manuscript Rules
 
-- Write it last.
-- Make it a standalone compressed version of the paper.
-- Keep the claims identical to the manuscript.
-- Avoid undefined acronyms, references, and empty generalities.
+1. **Separate evidence levels.** Keep own data, literature, reasonable inference, and speculation visibly distinct.
+2. **Do not invent.** Never fabricate P values, fold changes, sample sizes, approval numbers, supplier/catalog information, figure panels, or citations.
+3. **Preserve evidence boundaries.** Do not collapse in vitro into in vivo, candidate into verified, association into causality, or asymmetric model arms into a single strong mechanism.
+4. **Respect source of truth.** If split Markdown files exist, treat them as authoritative unless workspace rules say otherwise. Word-only edits must be backfilled into Markdown and verified section by section.
+5. **Prefer candidates over overwrites.** Generate a clearly named candidate Word file unless the user explicitly asks to overwrite.
+6. **Keep active directories clean.** Archive scripts, logs, audits, backups, and temporary extracts under `00_inbox/agent_artifacts`, `00_inbox`, or the workspace's artifact directory.
+7. **Honor minimal revision requests.** When the user says “最小修改原则”, preserve the original paragraph architecture and repair only what the stated correction requires.
 
-### Introduction
+## Default Workflow
 
-- Use three moves: background, gap, contribution.
-- Do not turn the Introduction into a literature dump.
-- State why the question matters and what this paper adds.
-
-### Methods
-
-- Write for reproducibility.
-- Include population, design, procedures, statistics, and ethics.
-- Use enough detail that another researcher could repeat the work.
-- If a method is standard and previously published, cite it instead of re-explaining it.
-
-### Results
-
-- Report what was found, not what it means.
-- Use representative data and keep negative findings when they affect interpretation.
-- Do not duplicate the same numbers in text and figures unless needed for emphasis.
-- Avoid vague quantifiers and interpretive words like obviously or clearly.
-
-### Discussion
-
-- Start with the main answer to the research question.
-- Then explain how the result fits the literature, what is unexpected, and what the limitations are.
-- End with a specific take-home message, not a generic call for more research.
+1. Identify manuscript type, target audience, target journal if known, and the requested section.
+2. Inspect local workspace rules (`AGENTS.md`, split Markdown sources, figure maps, terminology tables) before writing.
+3. Choose the section skill from the dispatch table.
+4. If claims depend on external literature, run an evidence-first search before drafting.
+5. Draft or revise only the requested scope.
+6. Run an anti-AI and overclaim pass.
+7. If producing Word output, use `docx-editing` validation rules: ZIP integrity, text extraction, relationship sanity when needed, and residual-marker search.
+8. Report what changed, what was assumed, and what remains unresolved.
 
 ## Anti-AI Style Check
 
 Before finalizing any paragraph, ask:
 
-- Did I say something concrete?
-- Did I remove any sentence that exists only to sound formal?
-- Did I replace vague hedging with a precise claim or a necessary hedge?
-- Did I vary sentence structure enough that the prose does not sound templated?
-- Did I avoid stock phrases such as "In the current era", "It is worth noting", or "more research is needed" when they add no information?
-- Did I avoid overusing adjectives, intensifiers, and abstract nouns?
+- Is every sentence doing work, or is it just sounding formal?
+- Did I replace vague abstractions with data, actors, actions, or consequences?
+- Did I avoid stock phrases such as “In the current era”, “It is worth noting”, “plays a crucial role”, and “future studies are needed” when they add no information?
+- Did I vary sentence structure without making the prose theatrical?
 - Did I keep the tone confident but not inflated?
+- Did I remove invented certainty?
 
-## Use the Reference Notes
+## Target-Journal Style Extraction
 
-See `references/article-notes.md` for article-derived examples and `references/style-guide.md` for anti-AI writing rules and rewrite patterns.
+When the user names a target journal and asks you to learn from similar published papers, do not merely summarize the papers. Build a reusable style guide or project-local skill that captures the journal's required components, article structure, evidence-boundary language, and section templates. Prefer 1–3 close articles from the exact journal plus the journal author guidelines. Keep source notes in a project-local file such as `source-articles.md` under that project's references directory, or an equivalent support file. See `references/target-journal-style-skill.md` for the full workflow.
+
+## Verification Checklist
+
+- [ ] Correct section-specific skill loaded for the actual task.
+- [ ] Workspace rules and source-of-truth files inspected when relevant.
+- [ ] If a target journal is named, author guidelines and 1–3 close source articles were checked before writing a style guide.
+- [ ] No invented statistics, citations, methods metadata, or figure/panel labels.
+- [ ] Evidence strength matches wording strength.
+- [ ] Markdown/Word synchronization handled or explicitly not in scope.
+- [ ] Unresolved items marked as `【待确认：...】` or reported separately rather than silently guessed.
